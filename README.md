@@ -1,30 +1,36 @@
 # Mina front-end coding challenge
 
-👋 Hello worthy challenger,
+## Setup
 
-As the next stage of your interview process we'd like you to build us a simple SPA using typescript, SCSS and the Github REST API.
+Tested and works with the following versions:
+  
+- npm: 8.11.0
+- node: 16.16.0
+- yarn: 1.22.19
 
-Using this repository as a base, we'd like you to send us a pull request with and an app that:
+If you're using nvm, the `.nvmrc` file has been set with the compatible node version.
 
-- Accepts a GitHub username
-- Displays information about the user (if valid - if invalid show appropriate feedback) including a list of their public repositories
-- Allows you to click a repository, navigating to a different route which displays the last 5 commits to that repo
+To install packages:
+`
+yarn install
+`
 
-We would like you to use:
+## Running the app
 
-- Typescript
-- SCSS
-- The Github REST API
-- React Router
-- Yarn
+In terminal run the following command:
+`yarn start`
 
-Apart from that, any library or technology choices are up to you.
+To run tests:
+`yarn test`
 
-Please commit all your work to a branch (not `main`) and send us a pull request
+## Rate limits
 
-Happy coding 😃
+By default there's a limit of 60 requests per hour on Github API for unauthenticated requests, add a **.env** file to the root  with an access token to increase this:
 
-## Things to note
+For example:
+`
+REACT_APP_GITHUB_TOKEN=<token-here>
+`
 
-- Browser support: modern browsers (i.e. no IE11)
-- This repository uses prettier for code formatting and won't let you push unless it's formatted correctly. You can do this using the Prettier VS code extension with `formatOnSave` turned on - you can also run `yarn prettier:write` from the root
+How to create a personal access token:
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token

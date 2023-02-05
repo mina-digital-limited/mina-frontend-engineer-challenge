@@ -1,7 +1,13 @@
-import React from "react";
+import { FC } from "react";
+import { Outlet } from "react-router-dom";
+import Layout from "./Layout/Layout";
 
-const App: React.FC = () => {
-  return <div>👋 Hey there worthy challenger, show us what you got </div>;
+const App: FC = () => {
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
 };
 
 export default App;
