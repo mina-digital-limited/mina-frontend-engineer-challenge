@@ -1,5 +1,15 @@
 # Notes
 
+## Updated - 25th Feb 23
+
+I’ve tacked on another commit to the pull request adding in and tidying up a couple of bits that I didn’t get time to address the first time around.
+
+Specifically, I wanted to show an example of why I’d chosen to use a reducer. In my initial commit the functionality was simple enough that the reducer wasn’t needed so it perhaps came across as over-engineered. My reasoning was that, for the app to be able to be scaled up, it would need state management. So what I’ve done is include an example of a more advanced feature that utilises the reducer more appropriately (pagination for commits).
+
+Secondly, I felt the unit tests that I’d provided were a bit rudimentary; they completely bypassed the api requests/responses and provided mock data directly to the components. So I’ve shown an example, in the CommitsList, of how msw could be used to listen for and respond to api requests.
+
+---
+
 ## Wireframes
 
 See 'wireframes' folder - a set of very rough sketches that I used to get the ball rolling.
