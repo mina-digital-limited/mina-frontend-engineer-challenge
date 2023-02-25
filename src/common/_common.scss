@@ -23,6 +23,33 @@
   }
 }
 
+.button {
+  padding: 12px 18px;
+  border: none;
+  margin-right: 12px;
+  background-color: var(--color-link);
+  font-size: 16px;
+  color: white;
+  font-weight: bold;
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-link--hover);
+  }
+
+  &:active {
+    background-color: #cfcfcf;
+  }
+
+  &:disabled {
+    background-color: #a0a0a0;
+  }
+}
+
 .paragraph {
   margin-top: 0;
   margin-bottom: var(--spacing);

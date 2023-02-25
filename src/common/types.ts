@@ -18,6 +18,7 @@ export enum ActionKind {
   COMMITS = "COMMITS",
   COMMITS_SUCCESS = "COMMITS_SUCCESS",
   COMMITS_ERROR = "COMMITS_ERROR",
+  COMMITS_RESET = "COMMITS_RESET",
 }
 
 export interface StateItem<T> {

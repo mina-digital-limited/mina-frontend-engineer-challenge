@@ -23,6 +23,9 @@ In terminal run the following command:
 To run tests:
 `yarn test`
 
+To run check test coverage:
+`yarn test --coverage`
+
 ## Rate limits
 
 By default there's a limit of 60 requests per hour on Github API for unauthenticated requests, add a **.env** file to the root  with an access token to increase this:

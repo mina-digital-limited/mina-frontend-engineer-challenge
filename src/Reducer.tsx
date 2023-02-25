@@ -47,12 +47,16 @@ const appReducer: Reducer<State, Action> = (
       };
 
     case ActionKind.COMMITS:
-      return { ...prevState, commits: { loading: true } };
+      return { ...prevState, commits: { ...prevState.commits, loading: true } };
 
     case ActionKind.COMMITS_SUCCESS:
       return {
         ...prevState,
-        commits: { data: data as Commits, headers, loading: false },
+        commits: {
+          data: (prevState.commits?.data || []).concat(data as Commits),
+          headers,
+          loading: false,
+        },
       };
 
     case ActionKind.COMMITS_ERROR:
@@ -60,6 +64,9 @@ const appReducer: Reducer<State, Action> = (
         ...prevState,
         commits: { error: data as ApiError, headers, loading: false },
       };
+
+    case ActionKind.COMMITS_RESET:
+      return { ...prevState, commits: {} };
 
     default:
       throw new Error(

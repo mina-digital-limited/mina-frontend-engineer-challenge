@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { renderWithContext } from "../common/testUtilities";
+import { renderContextWithProps } from "../common/testUtilities";
 import Profile from "./Profile";
 
 describe("Profile", () => {
@@ -13,19 +13,19 @@ describe("Profile", () => {
 
   it("Should render user details", () => {
     const bio = "this is all about me...";
-    renderWithContext(<Profile />, mockStore, { wrapper: MemoryRouter });
+    renderContextWithProps(<Profile />, mockStore, { wrapper: MemoryRouter });
 
     expect(screen.getByTestId("user-details")).toBeInTheDocument();
   });
 
   it("Should render repos list", () => {
-    renderWithContext(<Profile />, mockStore, { wrapper: MemoryRouter });
+    renderContextWithProps(<Profile />, mockStore, { wrapper: MemoryRouter });
 
     expect(screen.getByTestId("repos-list")).toBeInTheDocument();
   });
 
   it("Should render not repos list when no user", () => {
-    renderWithContext(
+    renderContextWithProps(
       <Profile />,
       { user: { loading: false } },
       { wrapper: MemoryRouter }

@@ -1,6 +1,6 @@
 {
   "name": "mina-front-end-coding-challenge",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "dependencies": {
     "@octokit/openapi-types": "^16.0.0",
@@ -14,6 +14,7 @@
     "@types/react-dom": "^18.0.10",
     "@types/react-router-dom": "^5.3.3",
     "husky": "^4.3.0",
+    "msw": "^1.1.0",
     "octokit": "^2.0.14",
     "prettier": "^2.2.1",
     "react": "^18.2.0",

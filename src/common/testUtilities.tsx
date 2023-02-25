@@ -1,24 +1,22 @@
-import { Context } from "../Context";
-import { render, RenderOptions, RenderResult } from "@testing-library/react";
+import ContextProvider, { Context } from "../Context";
+import { render, RenderOptions } from "@testing-library/react";
 import { ReactElement } from "react";
-import { State } from "./types";
 import {
   MemoryRouter,
   Routes,
-  Route,
   MemoryRouterProps,
+  Route,
 } from "react-router-dom";
-import ReposList from "../Repos/ReposList";
 
-export const renderWithContext = (
+export const renderContextWithProps = (
   ui: ReactElement,
-  providerProps: object,
+  providerProps: object = {},
   renderOptions?: RenderOptions<
     typeof import("@testing-library/dom/types/queries"),
     HTMLElement,
     HTMLElement
   >
-): RenderResult =>
+) =>
   render(
     <Context.Provider value={{ state: providerProps, dispatch: () => {} }}>
       {ui}
@@ -26,20 +24,51 @@ export const renderWithContext = (
     renderOptions
   );
 
-export const renderWithContextAndRouter = (
-  ui: ReactElement,
-  providerProps: object,
-  memoryRouterProps?: MemoryRouterProps,
+interface renderContextAndRouterOptions {
+  routerProps?: MemoryRouterProps;
   renderOptions?: RenderOptions<
     typeof import("@testing-library/dom/types/queries"),
     HTMLElement,
     HTMLElement
-  >
-): RenderResult =>
+  >;
+  path?: string;
+}
+
+export const renderContextAndRouter = (
+  ui: ReactElement,
+  { path, routerProps, renderOptions }: renderContextAndRouterOptions
+) =>
+  render(
+    <ContextProvider>
+      <MemoryRouter {...routerProps}>
+        <Routes>
+          <Route element={ui} path={path}></Route>
+        </Routes>
+      </MemoryRouter>
+    </ContextProvider>,
+    renderOptions
+  );
+
+interface renderContextAndRouterWithPropsOptions
+  extends renderContextAndRouterOptions {
+  providerProps?: object;
+}
+
+export const renderContextAndRouterWithProps = (
+  ui: ReactElement,
+  {
+    providerProps = {},
+    path,
+    routerProps,
+    renderOptions,
+  }: renderContextAndRouterWithPropsOptions = {}
+) =>
   render(
     <Context.Provider value={{ state: providerProps, dispatch: () => {} }}>
-      <MemoryRouter {...memoryRouterProps}>
-        <Routes>{ui}</Routes>
+      <MemoryRouter {...routerProps}>
+        <Routes>
+          <Route element={ui} path={path}></Route>
+        </Routes>
       </MemoryRouter>
     </Context.Provider>,
     renderOptions

@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import { renderWithContext } from "../common/testUtilities";
+import { renderContextWithProps } from "../common/testUtilities";
 import UserDetails from "./UserDetails";
 
 describe("UserDetails", () => {
@@ -20,13 +20,13 @@ describe("UserDetails", () => {
 
   describe("Loading", () => {
     it("Should render loading spinner when user is being loaded", () => {
-      renderWithContext(<UserDetails />, { user: { loading: true } });
+      renderContextWithProps(<UserDetails />, { user: { loading: true } });
 
       expect(screen.getByText("Loading user")).toBeInTheDocument();
     });
 
     it("Should not render loading spinner when loading false", () => {
-      renderWithContext(<UserDetails />, { user: { loading: false } });
+      renderContextWithProps(<UserDetails />, { user: { loading: false } });
 
       expect(screen.queryByText("Loading repos")).not.toBeInTheDocument();
     });
@@ -34,7 +34,7 @@ describe("UserDetails", () => {
 
   describe("Render user", () => {
     it("Should show full name when available", () => {
-      renderWithContext(<UserDetails />, mockStore);
+      renderContextWithProps(<UserDetails />, mockStore);
       expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(name);
     });
 
@@ -42,7 +42,7 @@ describe("UserDetails", () => {
       const mockStoreCopy = { ...mockStore };
       delete mockStoreCopy.user.data.name;
 
-      renderWithContext(<UserDetails />, mockStoreCopy);
+      renderContextWithProps(<UserDetails />, mockStoreCopy);
 
       expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
         login
@@ -50,7 +50,7 @@ describe("UserDetails", () => {
     });
 
     it("Should render avatar", () => {
-      renderWithContext(<UserDetails />, mockStore);
+      renderContextWithProps(<UserDetails />, mockStore);
 
       const avatar = screen.getByAltText("avatar");
 
@@ -62,7 +62,7 @@ describe("UserDetails", () => {
   describe("Error handling", () => {
     it("Should render error message when flagged in api response", () => {
       const message = "Not found";
-      renderWithContext(<UserDetails />, {
+      renderContextWithProps(<UserDetails />, {
         user: { loading: false, error: { message } },
       });
       expect(screen.getByText(message)).toBeInTheDocument();
