@@ -17,7 +17,7 @@ const Search: FC = () => {
   };
 
   return (
-    <form className="search" onSubmit={handleSubmit} data-testid="search">
+    <form className="search" onSubmit={handleSubmit}>
       <input
         className="search__input"
         type="search"

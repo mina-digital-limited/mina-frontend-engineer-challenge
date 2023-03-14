@@ -54,7 +54,7 @@ const ReposList: FC = () => {
   ));
 
   return (
-    <section className="section" data-testid="repos-list">
+    <section className="section">
       <h3 className="section__heading">Repositories</h3>
 
       <ul className="list">{repoListItems}</ul>

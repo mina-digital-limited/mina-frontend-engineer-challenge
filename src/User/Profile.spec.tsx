@@ -12,25 +12,26 @@ describe("Profile", () => {
     };
 
   it("Should render user details", () => {
-    const bio = "this is all about me...";
     renderContextWithProps(<Profile />, mockStore, { wrapper: MemoryRouter });
 
-    expect(screen.getByTestId("user-details")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
+      user.login
+    );
   });
 
   it("Should render repos list", () => {
     renderContextWithProps(<Profile />, mockStore, { wrapper: MemoryRouter });
 
-    expect(screen.getByTestId("repos-list")).toBeInTheDocument();
+    expect(screen.getByText("frontendUtils")).toBeInTheDocument();
   });
 
-  it("Should render not repos list when no user", () => {
+  it("Should not render repos list when no user", () => {
     renderContextWithProps(
       <Profile />,
       { user: { loading: false } },
       { wrapper: MemoryRouter }
     );
 
-    expect(screen.queryByTestId("repos-list")).not.toBeInTheDocument();
+    expect(screen.queryByText("frontendUtils")).not.toBeInTheDocument();
   });
 });

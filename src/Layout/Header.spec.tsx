@@ -20,6 +20,7 @@ describe("Header", () => {
   it("Should render search", () => {
     render(<Header />, { wrapper: MemoryRouter });
 
-    expect(screen.getByTestId("search")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Username")).toBeInTheDocument();
+    expect(screen.getByTitle("submit search")).toBeInTheDocument();
   });
 });

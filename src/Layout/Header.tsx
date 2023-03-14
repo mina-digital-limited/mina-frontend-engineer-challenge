@@ -5,7 +5,7 @@ import { APP_NAME } from "../common/constants";
 
 const Header: FC = () => {
   return (
-    <header className="header" data-testid="header">
+    <header className="header">
       <div className="header__container">
         <img className="header__logo" src={LogoIcon} alt="logo" />
 

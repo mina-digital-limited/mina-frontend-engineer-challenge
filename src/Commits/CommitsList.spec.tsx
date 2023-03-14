@@ -10,7 +10,8 @@ const path = "/user/:requestedUsername/repo/:requestedRepo",
   branchName = "branchName";
 
 const linkHeader =
-  '<https://api.github.com/repositories/4357713/commits?per_page=2&page=2>; rel="next", <https://api.github.com/repositories/4357713/commits?per_page=2&page=2>; rel="last"';
+  '<https://api.github.com/repositories/4357713/commits?per_page=2&page=2>; rel="next", ' +
+  '<https://api.github.com/repositories/4357713/commits?per_page=2&page=2>; rel="last"';
 
 const commits = [
   {
@@ -30,15 +31,6 @@ const commits = [
     },
   },
 ];
-
-const providerProps = {
-  commits: { loading: false, data: commits },
-  user: { loading: false, data: { login: username } },
-  repos: {
-    loading: false,
-    data: [{ id: 1, name: repoName, default_branch: branchName }],
-  },
-};
 
 const server = setupServer(
   rest.get(
@@ -63,158 +55,187 @@ const routerProps = {
 const renderOptions = { path, routerProps };
 
 describe("CommitsList", () => {
-  describe("Loading", () => {
-    it("Should render loading spinner when repos are being loaded", async () => {
-      renderContextAndRouter(<CommitsList />, renderOptions);
+  describe("GIVEN a user is on the commits list screen", () => {
+    beforeEach(() => renderContextAndRouter(<CommitsList />, renderOptions));
 
-      await waitFor(() =>
-        expect(screen.getByText(/loading commits/i)).toBeInTheDocument()
-      );
-
-      await waitFor(() =>
-        expect(screen.queryByText(/loading commits/i)).not.toBeInTheDocument()
-      );
+    describe("WHEN data is loading", () => {
+      test("THEN a loading message is shown", () => {
+        expect(screen.getByText(/loading commits/i)).toBeInTheDocument();
+      });
     });
-  });
 
-  describe("Basic rendering", () => {
-    it("Should render a link back to profile with relevant url", async () => {
-      renderContextAndRouter(<CommitsList />, renderOptions);
+    describe("WHEN data has loaded", () => {
+      test("THEN loading message is removed", async () => {
+        await waitFor(() => {
+          expect(
+            screen.queryByText(/loading commits/i)
+          ).not.toBeInTheDocument();
+        });
+      });
 
-      await waitFor(() => {
-        const backToProfile = screen.getByText("Back to profile");
+      test("THEN details for each commit are shown", async () => {
+        await waitFor(() => {
+          expect(screen.getByText("initial commit")).toBeInTheDocument();
+          expect(screen.getByText("code review changes")).toBeInTheDocument();
+        });
 
-        expect(backToProfile).toBeInTheDocument();
-        expect(backToProfile?.closest("a")).toHaveAttribute(
-          "href",
-          "/user/" + username
+        commits.forEach((commit) => {
+          const withinLi = within(
+              screen
+                .getByText(commit.commit.message)
+                .closest("li") as HTMLElement
+            ),
+            authorName = commit.commit.author.name,
+            authorElement = withinLi.getByText(authorName),
+            createdDate = new Date(commit.commit.author.date)
+              .toLocaleDateString()
+              .toString();
+
+          expect(authorElement).toBeInTheDocument();
+          expect(authorElement?.closest("a")).toHaveAttribute(
+            "href",
+            `/user/${authorName}`
+          );
+          expect(
+            withinLi.getByText(createdDate, { exact: false })
+          ).toBeInTheDocument();
+        });
+      });
+
+      test("THEN back to profile link is shown with appropriate URL", async () => {
+        await waitFor(() => {
+          const backToProfile = screen.getByText("Back to profile");
+
+          expect(backToProfile).toBeInTheDocument();
+          expect(backToProfile?.closest("a")).toHaveAttribute(
+            "href",
+            "/user/" + username
+          );
+        });
+      });
+
+      test("THEN user details are shown", async () => {
+        await waitFor(() =>
+          expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
+            username
+          )
+        );
+      });
+
+      test("THEN repo name is shown", async () => {
+        await waitFor(() =>
+          expect(
+            screen.getByText("Repo: " + repoName, { exact: false })
+          ).toBeInTheDocument()
         );
       });
     });
 
-    it("Should render user details", async () => {
-      renderContextAndRouter(<CommitsList />, renderOptions);
+    describe("WHEN an error occurs", () => {
+      const message = "Not found";
 
-      await waitFor(() =>
-        expect(screen.getByTestId("user-details")).toBeInTheDocument()
-      );
-    });
+      beforeAll(() => {
+        server.use(
+          rest.get(
+            `https://api.github.com/repos/${username}/${repoName}/commits`,
+            (req, res, ctx) => {
+              return res(ctx.json({ message }), ctx.status(404));
+            }
+          )
+        );
+      });
 
-    it("Should render repo details", async () => {
-      renderContextAndRouter(<CommitsList />, renderOptions);
-
-      await waitFor(() =>
-        expect(
-          screen.getByText("Repo: " + repoName, { exact: false })
-        ).toBeInTheDocument()
-      );
+      test("THEN an error message is shown", async () => {
+        await waitFor(() =>
+          expect(screen.getByText(message)).toBeInTheDocument()
+        );
+      });
     });
   });
 
-  describe("Render commits", () => {
-    it("Should render a list of commits", async () => {
-      renderContextAndRouter(<CommitsList />, renderOptions);
+  describe("GIVEN commits span multiple pages", () => {
+    let nextButton: HTMLElement, previousButton: HTMLElement;
 
-      await waitFor(() => {
+    beforeEach(async () => {
+      renderContextAndRouter(<CommitsList perPage={1} />, renderOptions);
+      await waitFor(() => screen.getByText("initial commit"));
+
+      (nextButton = screen.getByRole("button", { name: /older/i })),
+        (previousButton = screen.getByRole("button", { name: /newer/i }));
+    });
+
+    describe("WHEN commits list screen is first loaded", () => {
+      test("THEN only commits from first page are shown", () => {
         expect(screen.getByText("initial commit")).toBeInTheDocument();
+        expect(
+          screen.queryByText("code review changes")
+        ).not.toBeInTheDocument();
+      });
+
+      test("THEN page counter is displayed with appropriate values", () => {
+        expect(screen.getByText(/page 1 of 2/i)).toBeInTheDocument();
+      });
+
+      test("THEN previous button is disabled", () => {
+        expect(previousButton).toBeDisabled();
+      });
+
+      test("THEN next button is enabled", () => {
+        expect(nextButton).not.toBeDisabled();
+      });
+    });
+
+    describe("WHEN user clicks next button", () => {
+      beforeEach(async () => {
+        fireEvent.click(nextButton);
+        await waitFor(() => screen.getByText("code review changes"));
+      });
+
+      test("THEN only commits from next page are shown", async () => {
+        expect(screen.queryByText("initial commit")).not.toBeInTheDocument();
         expect(screen.getByText("code review changes")).toBeInTheDocument();
       });
 
-      commits.forEach((commit) => {
-        const withinLi = within(
-            screen.getByText(commit.commit.message).closest("li") as HTMLElement
-          ),
-          authorName = commit.commit.author.name,
-          authorElement = withinLi.getByText(authorName),
-          createdDate = new Date(commit.commit.author.date)
-            .toLocaleDateString()
-            .toString();
+      test("THEN page counter is update with appropriate values", () => {
+        expect(screen.getByText(/page 2 of 2/i)).toBeInTheDocument();
+      });
 
-        expect(authorElement).toBeInTheDocument();
-        expect(authorElement?.closest("a")).toHaveAttribute(
-          "href",
-          `/user/${authorName}`
-        );
-        expect(
-          withinLi.getByText(createdDate, { exact: false })
-        ).toBeInTheDocument();
+      test("THEN next button is disabled", () => {
+        expect(nextButton).toBeDisabled();
+      });
+
+      test("THEN previous button is disabled", () => {
+        expect(previousButton).not.toBeDisabled();
       });
     });
-  });
 
-  describe("Pagination", () => {
-    it("Should render first page", async () => {
-      renderContextAndRouter(<CommitsList perPage={1} />, renderOptions);
+    describe("WHEN user clicks previous button", () => {
+      beforeEach(async () => {
+        fireEvent.click(nextButton);
+        await waitFor(() => screen.getByText("code review changes"));
 
-      await waitFor(() => screen.getByText("initial commit"));
+        fireEvent.click(previousButton);
+        await waitFor(() => screen.getByText("initial commit"));
+      });
 
-      const nextButton = screen.getByRole("button", { name: /older/i }),
-        previousButton = screen.getByRole("button", { name: /newer/i });
+      test("THEN only commits from previous page are shown", () => {
+        expect(screen.getByText("initial commit")).toBeInTheDocument();
+        expect(
+          screen.queryByText("code review changes")
+        ).not.toBeInTheDocument();
+      });
 
-      expect(screen.getByText("initial commit")).toBeInTheDocument();
+      test("THEN page counter is displayed with appropriate values", () => {
+        expect(screen.getByText(/page 1 of 2/i)).toBeInTheDocument();
+      });
 
-      expect(screen.queryByText("code review changes")).not.toBeInTheDocument();
+      test("THEN previous button is disabled", () => {
+        expect(previousButton).toBeDisabled();
+      });
 
-      expect(screen.getByText(/page 1 of 2/i)).toBeInTheDocument();
-
-      expect(previousButton).toBeDisabled();
-      expect(nextButton).not.toBeDisabled();
-    });
-
-    it("Should navigate between pages", async () => {
-      renderContextAndRouter(<CommitsList perPage={1} />, renderOptions);
-
-      await waitFor(() => screen.getByText("initial commit"));
-
-      const nextButton = screen.getByRole("button", { name: /older/i }),
-        previousButton = screen.getByRole("button", { name: /newer/i });
-
-      fireEvent.click(nextButton);
-
-      await waitFor(() => screen.getByText("code review changes"));
-
-      expect(screen.queryByText("initial commit")).not.toBeInTheDocument();
-
-      expect(screen.getByText("code review changes")).toBeInTheDocument();
-
-      expect(screen.getByText(/page 2 of 2/i)).toBeInTheDocument();
-
-      expect(nextButton).toBeDisabled();
-      expect(previousButton).not.toBeDisabled();
-
-      fireEvent.click(previousButton);
-
-      await waitFor(() => screen.getByText("initial commit"));
-
-      expect(screen.getByText("initial commit")).toBeInTheDocument();
-
-      expect(screen.queryByText("code review changes")).not.toBeInTheDocument();
-
-      expect(screen.getByText(/page 1 of 2/i)).toBeInTheDocument();
-
-      expect(previousButton).toBeDisabled();
-      expect(nextButton).not.toBeDisabled();
-    });
-  });
-
-  describe("Error handling", () => {
-    it("Should render error message when flagged in api response", async () => {
-      const message = "Not found";
-
-      server.use(
-        rest.get(
-          `https://api.github.com/repos/${username}/${repoName}/commits`,
-          (req, res, ctx) => {
-            return res(ctx.json({ message }), ctx.status(404));
-          }
-        )
-      );
-
-      renderContextAndRouter(<CommitsList />, renderOptions);
-
-      await waitFor(() =>
-        expect(screen.getByText(message)).toBeInTheDocument()
-      );
+      test("THEN next button is enabled", () => {
+        expect(nextButton).not.toBeDisabled();
+      });
     });
   });
 });
