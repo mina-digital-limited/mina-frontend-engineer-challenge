@@ -24,8 +24,9 @@ We would like you to use:
 ## Things to note
 
 - Implementation of styling (css) is unopinionated, use whatever you see fit
-- Browser support: modern browsers (i.e. no IE11)
+- If possible, use [api routing](https://nextjs.org/docs/pages/building-your-application/routing/api-routes)
 - If possible, test the application at page and component level
+- Browser support: modern browsers (i.e. no IE11)
 
 ## How to submit your code
 
