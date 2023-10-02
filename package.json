@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "jest --watch",
+    "test:ci": "jest --ci",
     "lint": "next lint"
   },
   "dependencies": {
@@ -14,11 +16,17 @@
     "next": "latest"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/user-event": "latest",
+    "@types/jest": "latest",
     "typescript": "latest",
     "@types/react": "latest",
     "@types/node": "latest",
     "@types/react-dom": "latest",
     "eslint": "latest",
-    "eslint-config-next": "latest"
+    "eslint-config-next": "latest",
+    "jest": "latest",
+    "jest-environment-jsdom": "latest"
   }
 }
