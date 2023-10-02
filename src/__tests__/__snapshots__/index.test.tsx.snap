@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GIVEN the Homepage is rendered THEN the layout is unchanged 1`] = `
+<div>
+  <main
+    class="main"
+  >
+    <h1>
+      👋 Hello World 👋
+    </h1>
+  </main>
+</div>
+`;
